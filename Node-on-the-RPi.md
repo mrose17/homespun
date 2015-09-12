@@ -25,6 +25,7 @@ The next thing to do is make sure the platform is current with respect to its pa
         ...
         pi@raspberrypi ~ $ sudo apt-get upgrade -y
         ...
+        pi@raspberrypi ~ $ sudo reboot
 
 These commands may take a while.
 Please be patient.
@@ -65,6 +66,10 @@ to this:
 
         # do not allow plaintext passwords
         PasswordAuthentication no
+
+Finally, run this:
+
+        pi@raspberrypi ~ $ sudo /etc/init.d/ssh restart
 
 Henceforth,
 you will connect to the platform like this:
