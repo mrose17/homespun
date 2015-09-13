@@ -228,13 +228,13 @@ the value being reported refers to the sensor's reporting range:
 |flame_detected|boolean|
 |humidity|percentage|
 |liquid_detected|boolean|
-|loudness|percentage|
 |moisture|percentage|
 |motion|boolean|
 |opened|boolean|
 |powered|boolean|
 |pressed|boolean|
 |signal|percentage|
+|sonority|percentage|
 |tamper_detected|boolean|
 |vibration|boolean|
 
