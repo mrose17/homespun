@@ -12,10 +12,6 @@ require('cadence/loops')
 // jscs:disable requireMultipleVarDecl
 var SNMP = function (config, services) {
     Driver.call(this, config, services)
-
-    this.nodes = {}
-
-    setTimeout(this.ticktock.bind(this), 15 * 1000)
 }
 
 var oidI = function (s) {
@@ -43,9 +39,6 @@ SNMP.prototype.initialize = cadence(function (async) {/* jshint unused: false */
         console.log(err.stack)
     }).on('message', function (buffer, rinfo) {
         var bindings, dispatcher, packet
-
-        if (!!self.nodes[rinfo.address + ':' + rinfo.port]) return
-        self.nodes[rinfo.address + ':' + rinfo.port] = new Date().getTime() + (15 * 60 * 1000)
 
         packet = snmp.parse(buffer)
 
@@ -103,16 +96,6 @@ SNMP.prototype.ping = function () {
         this.logger.error('initialize', { event : 'send', err : err.message })
         console.log(err.stack)
     })
-}
-
-SNMP.prototype.ticktock = function () {
-    var now = new Date().getTime()
-
-    if (this.stopP) return
-    underscore.keys(this.nodes).forEach(function (key) {
-        if (this.nodes[key] <= now) delete(this.nodes[key])
-    }.bind(this))
-    setTimeout(this.ticktock.bind(this), 15 * 1000)
 }
 
 SNMP.prototype.finalize = cadence(function (async) {/* jshint unused: false */
@@ -173,16 +156,18 @@ SNMP.prototype.dispatch[sysObjectIDs.serverscheck] = cadence(function (async, ri
             sensor.lastReading[key] = properties[key]
         }.bind(this))
 
-        if (!!this.sensors[uuid]) return
+        async(function () {
+            if (!!this.sensors[uuid]) return
 
-        this.register(this, sensor.name, uuid, capabilities, async())
-    }, function (sensorID) {
-        if (sensorID === false) return
-        if (!!sensorID) {
-            this.sensors[uuid] = underscore.extend(sensor, { sensorID : sensorID })
-        }
+            this.register(this, sensor.name, uuid, capabilities, async())
+        }, function (sensorID) {
+            if (sensorID === false) return
+            if (!!sensorID) {
+                this.sensors[uuid] = underscore.extend(sensor, { sensorID : sensorID })
+            }
 
-        this.upsync(this, sensor.sensorID, sensor.lastReading, async())
+            this.upsync(this, sensor.sensorID, sensor.lastReading, async())
+        })
     })
 })
 
