@@ -1,6 +1,7 @@
 # Logs
 logs
 *.log
+typescript
 
 # Runtime data
 pids

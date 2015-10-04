@@ -159,7 +159,6 @@ SNMP.prototype.dispatch[sysObjectIDs.serverscheck] = cadence(function (async, ri
                 underscore.extend(properties, this.normalize(names[subtree], varbind.value))
             }
         }.bind(this))
-        console.log('SNMP 2: ' + util.inspect(properties, { depth : null }))
 
 // TODO: use MAC address + rinfo.port
         uuid = rinfo.address + ':' + rinfo.port

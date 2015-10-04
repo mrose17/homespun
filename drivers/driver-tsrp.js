@@ -21,6 +21,7 @@ util.inherits(TSRP, Driver)
 
 
 TSRP.prototype.initialize = cadence(function (async) {/* jshint unused: false */
+// TODO: rate-limiting on upsync
 return
     var ipaddr = '224.0.9.1'
       , portno = 22601
