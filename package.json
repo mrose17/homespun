@@ -1,0 +1,47 @@
+{ "name"                      : "homespun"
+, "version"                   : "0.1.0"
+, "main"                      : "node server.js"
+, "author"                    : "Marshall Rose <mrose17@homespun.io>"
+, "description"               : ""
+, "keywords"                  : [ "homespun", "sensors", "home automation"
+                                , "numerous"
+                                , "TSRP", "Yoctopuce", "cubesensors", "foobot", "netatmo", "snmp"
+                                ]
+, "contributors"              : [ "Marshall Rose <mrose17@homespun.io>" ]
+, "maintainers"               : [ "Marshall Rose <mrose17@homespun.io>" ]
+, "homepage"                  : "http://github.com/mrose17/homespun"
+, "repository"                : 
+  { "type"                    : "git"
+  , "url"                     : "git://github.com/mode17/homespun.git"
+  }
+,  "dependencies"             : 
+   { "arguable"               : "0.0.20"
+   , "body-parser"            : "1.13.2"
+   , "cadence"                : "0.0.56" 
+   , "connect"                : "3.0.1"
+   , "express-xml-bodyparser" : "0.0.7"
+   , "inlet"                  : "0.2.4"
+   , "node-static"            : "0.7.7"
+   , "node-uuid"              : "1.4.1"
+   , "oauth"                  : "git://github.com/TheThingSystem/node-oauth.git"
+   , "prolific"               : "0.0.4"
+   , "snmp-native"            : "1.0.18"
+   , "underscore"             : "1.8.3"
+   , "vizsla"                 : "0.0.2"
+   , "xml2js"                 : "~0.2.8"
+   , "yoctolib"               : "1.10.123"
+   }
+  , "devDependencies"         :
+   { "body-parser"            : "1.13.2"
+   , "connect"                : "3.0.1"
+   , "istanbul"               : "0.3.2"
+   , "jscs"                   : "^1.6.2"
+   , "jshint"                 : "*"
+   , "proof"                  : "0.0.52"
+   }
+, "scripts"                   :
+   { "lint"                   : "jshint --config .jshintrc *.js */*.js *.json && jscs --config .jscs.json --no-colors *.js */*.js"
+   , "test"                   : "(proof run t/*/*.t.js | tee .proof.out | proof progress) || (proof errors < .proof.out) || exit    1"
+   , "cover"                  : "t/cover && open coverage/lcov-report/index.html"
+   }
+}

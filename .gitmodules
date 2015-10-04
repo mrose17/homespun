@@ -1,0 +1,6 @@
+[submodule "examples/grove-pi"]
+	path = examples/grove-pi
+	url = git://github.com/mrose17/homespun.git
+[submodule "examples/arduino"]
+	path = examples/arduino
+	url = git://github.com/mrose17/homespun-arduino.git

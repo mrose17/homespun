@@ -1,7 +1,11 @@
 # homespun
 This is the root of the homespun family of repositories:
-you run a server in your home that collects sensor readings and uploads them to the management cloud of your choice --
-here's [my choice](https://github.com/homespun-wink).
+you run a server in your home that collects sensor readings and uploads them to the management cloud of your choice.
+At present,
+upload to only one cloud is available:
+[numerous](http://numerousapp.com/).
+It is meant to be easy to add support for other clouds.
+
 
 Note that this repository does not have either the "Issues" or "Wiki" sections --
 if you want to discuss the homespun framework,
@@ -21,17 +25,12 @@ which can then be monitored, used as triggers for robots, and so on.
 The sensor platform can be either an "always-on" spare computer such as a dedicated micro-processor.
 The sensor platform should **never** be your desktop computer or a computer that isn't always on or has poor network access.
 
-At present,
-there is only one management cloud supported:
-[Wink](http://wink.com/),
-cf., [homespun-wink](https://github.com/homespun-wink).
-
 Here is an end-to-end example:
 
             +--------------+ +--------------------+            +-----------------------+
             |    sensor    |-|  micro-controller  |  talks to  |   sensor platform     |
             |              |-|                    |  ------->  |                       |
-            |  e.g. TMP36  |-|   e.g., Arduino    |            | running homespun-wink |
+            |  e.g. TMP36  |-|   e.g., Arduino    |            |   running homespun    |
             +--------------+ +--------------------+            +-----------------------+
                                                                            |
         home network                                                       |
@@ -40,14 +39,14 @@ Here is an end-to-end example:
                                                                            |
                                                                           \|/
                                                                  +--------------------+
-                                                                 |   the wink cloud   |
+                                                                 |     the cloud      |
                                                                  +--------------------+
                                                                           /|\
                                                                            |
                                                                            |
                                                                           \|/
                                                                  +--------------------+
-                                                                 |    any wink app    |
+                                                                 |     cloud app      |
                                                                  +--------------------+
 
 There are many ways to [connect a sensor](http://playground.arduino.cc/Main/InterfacingWithHardware#Input)
@@ -61,12 +60,12 @@ e.g., [Maker Shed](http://www.makershed.com/collections/arduino-shields-accessor
 and [Seeed Studio](http://www.seeedstudio.com/depot/Shield-t-2.html).
 
 An alternative architecture is to attach the sensor directly to the sensor platform,
-and have `homespun-wink` read directly from the GPIO pins or the USB port:
+and have `homespun` read directly from the GPIO pins or the USB port:
 
                              +---------------+ +-----------------------+
                              |    sensor     |-|   sensor platform     |
                              |               |-|                       |
-                             |  e.g., TMP36  |-| running homespun-wink |
+                             |  e.g., TMP36  |-|   running homespun    |
                              +---------------+ +-----------------------+
                                                            |
         home network                                       |
@@ -75,14 +74,14 @@ and have `homespun-wink` read directly from the GPIO pins or the USB port:
                                                            |
                                                           \|/
                                                  +--------------------+
-                                                 |   the wink cloud   |
+                                                 |     the cloud      |
                                                  +--------------------+
                                                           /|\
                                                            |
                                                            |
                                                           \|/
                                                  +--------------------+
-                                                 |    any wink app    |
+                                                 |     cloud app      |
                                                  +--------------------+
 
 For the Raspberry Pi,
@@ -122,17 +121,13 @@ You can also plug the Yoctopuce sensors into an Ethernet or Wi-Fi hub to make th
 
 Finally,
 you may already have a sensor in your home that talks to a third-party cloud service,
-but isn't integrated with Wink.
-(By the way:
-a cloud vendor really should integrate directly with a management cloud -- if you're a customer of one of these providers,
-why not ask them to integrate with Wink?)
 If the vendor already has a consumer API,
 you could use this architecture:
 
             +--------------+                                   +-----------------------+
             |    sensor    |    talks to          talks to     |   sensor platform     |
             |              |  ------------+    +-------------  |                       |
-            |  e.g. TMP36  |              |    |               | running homespun-wink |
+            |  e.g. TMP36  |              |    |               |   running homespun    |
             +--------------+              |    |               +-----------------------+
                                           |    |                            |
         home network                      |    |                            |
@@ -141,19 +136,71 @@ you could use this architecture:
                                           |    |                            |
                                          \|/  \|/                          \|/
                                      +----------------+           +-------------------+
-                                     | vendor's cloud |           |   the wink cloud  |
+                                     | vendor's cloud |           |     the cloud     |
                                      +----------------+           +-------------------+
                                                                            /|\
                                                                             |
                                                                             |
                                                                            \|/
                                                                   +-------------------+
-                                                                  |    any wink app   |
+                                                                  |     cloud app     |
                                                                   +-------------------+
 
+## Installation
+To begin,
+you will need to have [Node.js](https://nodejs.org) running on a _sensor platform_.
+
+Node.js is available on many, many different computing platforms.
+If you are familiar with JavaScript,
+then you can learn to program in Node.js very quickly --
+and if you aren't familiar with JavaScript,
+you can become familiar with it easily.
+
+### Get a sensor platform
+If you are starting from scratch,
+you have many excellent options.
+Here's one:
+the [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/).
+For less than USD40,
+you get a very powerful, very small ARM-A7 computer.
+When you purchase the RPi2 model B,
+you will probably have the option of also purchasing a Micro SD card containing the filesystem.
+One option is a [4GB SD card with Raspian Wheezy](http://www.adafruit.com/products/1121) already installed.
+
+The next step is to configure an RPi for secure local access and install Node.js and `node-gyp`.
+The instructions are [here](https://github.com/mrose17/homespun/blob/master/RPi.md).
+
+### Install homespun
+Go to the directory where you have downloaded [homespun](https://github.com/mrose17/homespun/archive/master.zip)
+and run `npm -l install`:
+
+        pi@raspberrypi ~ $ cd homespun-master/
+        pi@raspberrypi ~/homespun-master $ npm -l install
+        ...
+
 ## Management Clouds
-`homespun-wink` is a Node.js module that supports several
-[drivers](https://github.com/mrose17/homespun-wink#supported-drivers).
+_To be documented once the `configurator` is implemented._
+
+For now,
+create a file called `datastore/clouds/numerous.json`.
+Here is what it should contain:
+
+        [
+          {
+            "cloud"       : "numerous",
+            "id"          : 1,
+            "server"      : "https://api.numerousapp.com/",
+            "credentials" : {
+              "api_key"   : "..."
+            }
+          }
+        ]
+
+You can determine the value of `apiKey` by running the `numerous` mobile application and looking under 
+`Settings > Developer Info`.
+
+## Supported Sensor Drivers
+`homespun` comes with some pre-written sensor drivers to help you get started!
 
 It is easiest to integrate using [TSRP](http://thethingsystem.com/dev/Thing-Sensor-Reporting-Protocol.html).
 At present,
@@ -165,7 +212,8 @@ there are two repositories that contain TSRP transcoders:
 * [homespun-grovepi](https://github.com/mrose17/homespun-grovepi), a Node.js module for the
 [Raspberry Pi](https://www.raspberrypi.org) and a [GrovePi+ Shield](http://www.dexterindustries.com/shop/grovepi-board/).
 
-`homespun-wink` also knows how to [talk to Yoctopuce sensors](https://github.com/mrose17/homespun-wink#yoctopuce).
+`homespun` also knows how to [talk to Yoctopuce sensors].
+
 It also knows how to talk to the 
 [CubeSensors](https://cubesensors.com),
 [Foobot](http://foobot.io),
@@ -173,6 +221,82 @@ and
 [Netatmo](https://www.netatmo.com/en-US/product/weather-station)
 clouds,
 although configuration isn't automated as it is with the TSRP and Yoctopuce drivers.
+
+### TSRP
+First read this [file](examples/README.md).
+
+The easiest way to integrate your sensor with `homespun` is to have write code that reads the sensor value and uses 
+the [TSRP](http://thethingsystem.com/dev/Thing-Sensor-Reporting-Protocol.html) to report values.
+Take a look at the examples for the [Arduino](examples/arduino/README.md)
+and for the [GrovePi](examples/grove-pi/README.md).
+
+For example,
+looking at [Arduino example](examples/arduino/WaterSensor)
+you'll see a file called `WaterSensor.ino` -- this is an Arduino _sketch_ file (a program),
+that is compiled with the Arduino [IDE](https://www.arduino.cc/en/Guide/Environment).
+It expects that digital pin 7 is connected to
+a [Grove Water Sensor](http://www.seeedstudio.com/depot/Grove-Water-Sensor-p-748.html).
+You can either connect the sensor directly or using a
+[Grove Shield](http://www.seeedstudio.com/wiki/Grove_-_Base_Shield_V1.3) for the Arduino.
+
+The sketch starts by getting a DHCP address for the Arduino,
+it prints out the MAC and IP addresses,
+and then opens up the multicast UDP port for TSRP.
+It reads from pin D7 and constructs a TSRP packet that is then multicast to the local network.
+The TSRP driver for `homespun` listens for these packets,
+transcodes them into a format suitable for the configured cloud,
+and then uploads them.
+
+The [GrovePi example](examples/grove-pi) is a little more complicated.
+It expects that you have a Raspberry Pi with a [GrovePi+ Shield](http://www.dexterindustries.com/shop/grovepi-board/).
+A configuration file (`config.json`) tells the program (`multi-sensor.js`) what sensor is on each port -- in this case,
+pin D7 also has a Grove Water Sensor.
+
+### Yoctopuce
+[Yoctopuce](http://www.yoctopuce.com) makes a wide range of _prosumer_ (Swiss-made) sensors.
+You can either plug them into the USB ports on your sensor platform and run a program called
+[VirtualHub](https://www.yoctopuce.com/EN/virtualhub.php) that makes them available,
+or you can attach them to a Yoctopuce Ethernet or Wi-Fi hub to make the readings available on your local network.
+Either way,
+`homespun` will automatically discover the sensors and report their values.
+
+At present,
+any sensors reporting this values are supported:
+
+    altitude, co, co2, humidity, light, no2, pressure, temperature, voc
+
+If you are using either the [Yocto-0-10V-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-rx)
+or [Yocto-4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-rx)
+to read an industrial sensor following either of these two standards,
+then you **must** set the `Mapped value unit` to reflect what is being measured.
+In this example,
+the leads for `genericSensor1` are connected to a `co` sensor,
+and the leads for `genericSensor2` are connected to a `no2` sensor:
+
+<img src='images/01.png'/>
+
+Optionally,
+you can also define the `Logical name` of each sensor.
+In the example above,
+the logical name is `Uber-Sensor-4-20mA`.
+
+### SNMP
+Although the [Simple Network Management Protocol](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol)
+is intended for managing networks,
+some vendors make sensor information available using this protocol.
+
+At present,
+`homespun` supports only the [ServersCheck](https://serverscheck.com) sensors.
+Take a look at `drivers/driver-snmp.js` to see how dispatch is done based on the `sysObjectID` of the SNMP agent.
+
+### CubeSensors
+_To be documented once the `configurator` is implemented._
+
+### Foobot
+_To be documented once the `configurator` is implemented._
+
+### Netatmo
+_To be documented once the `configurator` is implemented._
 
 ## Measurement Taxonomy
 The homespun family divides the "sensor world" into three parts:
