@@ -39,7 +39,7 @@ Numerous.prototype.finalize = cadence(function (async) {/* jshint unused: false 
 Numerous.prototype.register = cadence(function (async, instance, name, uuid, capabilities) {
 console.log('register ' + instance.config.driver + ':' + instance.config.id + ' ' + name + ' '
 + uuid + ' ' + JSON.stringify(capabilities, null, 2) + '\n')
-    var stmt
+    var device, stmt
       , deviceID = instance.config.driver + ':' + uuid
 
     if (!this.readyP) return false
@@ -47,8 +47,6 @@ console.log('register ' + instance.config.driver + ':' + instance.config.id + ' 
     if (!!this.config.devices[deviceID]) return deviceID
 
     stmt = async(function () {
-        var device
-
         device = { deviceID : deviceID, entries : {}, capabilities : capabilities }
         async.forEach(function (field) {
             var key = field.field
@@ -94,7 +92,7 @@ console.log('register ' + instance.config.driver + ':' + instance.config.id + ' 
                 device.entries[key] = { metric : body, field : field }
             })
         })(capabilities.fields)
-
+    }, function () {
         this.config.devices[deviceID] = device
         this.persist(this.config, async())
     }, function () {
