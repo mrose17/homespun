@@ -13,7 +13,9 @@ require('cadence/loops')
 var SNMP = function (config, services) {
     Driver.call(this, config, services)
 
-    this.timestamps = {}
+    this.nodes = {}
+
+    setTimeout(this.ticktock.bind(this), 15 * 1000)
 }
 
 var oidI = function (s) {
@@ -22,6 +24,10 @@ var oidI = function (s) {
 
 var oidS = function (b) {
     return underscore.map(b, function (n) { return n.toString() }).join('.')
+}
+
+var sysObjectIDs =
+{ serverscheck : '1.3.6.1.4.1.17095'
 }
 // jscs:enable requireMultipleVarDecl
 util.inherits(SNMP, Driver);
@@ -36,9 +42,11 @@ SNMP.prototype.initialize = cadence(function (async) {/* jshint unused: false */
         self.logger.error('initialize', { event : 'createSocket', err : err.message })
         console.log(err.stack)
     }).on('message', function (buffer, rinfo) {
-        var bindings, packet, session
+        var bindings, dispatcher, packet
 
-        console.log('message from ' + JSON.stringify(rinfo))
+        if (!!self.nodes[rinfo.address + ':' + rinfo.port]) return
+        self.nodes[rinfo.address + ':' + rinfo.port] = new Date().getTime() + (15 * 60 * 1000)
+
         packet = snmp.parse(buffer)
 
         if ((!packet.pdu) || (packet.pdu.type !== 2) || (packet.pdu.error !== 0)
@@ -47,50 +55,18 @@ SNMP.prototype.initialize = cadence(function (async) {/* jshint unused: false */
         bindings = packet.pdu.varbinds
         if (bindings[1].type !== 6) return
 
-        if (oidS(bindings[1].value) != '1.3.6.1.4.1.17095') return
+        dispatcher = self.dispatch[oidS(bindings[1].value)]
+        if (!dispatcher) return
 
-        console.log('SNMP: ' + bindings[0].value + ' : ' + bindings[2].value)
+        dispatcher.bind(self)(rinfo, bindings, function (err) {
+            if (!err) return
 
-        session = new snmp.Session({ host : rinfo.address })
-        session.getSubtree({ oid : oidI('1.3.6.1.4.1.17095.3') }, function (err, varbinds) {
-            var name, properties
-
-            if (!!err) {
-                self.logger.error('initialize', { event : 'control', err : err.message }, rinfo)
-                return console.log(err.stack)
-            }
-
-            name = '-'
-            properties = {}
-            varbinds.forEach(function (varbind) {
-                var leaf = varbind.oid[varbind.oid.length - 2]
-                if ((leaf % 4) === 1) name = varbind.value
-                else if ((leaf % 4) === 2) {
-                    underscore.extend(properties, self.normalize(name, varbind.value))
-                }
-            })
-            console.log('SNMP: ' + util.inspect(properties, { depth : null }))
-        })
-        session.getSubtree({ oid : oidI('1.3.6.1.4.1.17095.11') }, function (err, varbinds) {
-            var names, properties
-
-            if (!!err) {
-                self.logger.error('initialize', { event : 'sensorTable', err : err.message }, rinfo)
-                return console.log(err.stack)
-            }
-
-            names = {}
-            properties = {}
-            varbinds.forEach(function (varbind) {
-                var leaf    = varbind.oid[varbind.oid.length - 2]
-                  , subtree = varbind.oid[varbind.oid.length - 3]
-
-                if (leaf === 1) names[subtree] = varbind.value
-                else if ((leaf === 2) && (!!names[subtree])) {
-                    underscore.extend(properties, self.normalize(names[subtree], varbind.value))
-                }
-            })
-            console.log('SNMP: ' + util.inspect(properties, { depth : null }))
+            self.logger.error('initialize'
+                        , { event  : 'dispatcher'
+                          , err    : err.message
+                          , rinfo  : rinfo
+                          })
+            console.log(err.stack)
         })
     }).on('listening', function () {
         var data, packet
@@ -100,31 +76,115 @@ SNMP.prototype.initialize = cadence(function (async) {/* jshint unused: false */
         this.setBroadcast(true)
         this.setTTL(10)
 
-        packet = new snmp.Packet()
-        // sysDescr.0, sysObjectID.0, and sysName.0
-        packet.pdu.varbinds[0].oid = oidI('1.3.6.1.2.1.1.1.0')
-        packet.pdu.varbinds[1] = underscore.extend({}, packet.pdu.varbinds[0]
-                                                   , { oid : oidI('1.3.6.1.2.1.1.2.0') } )
-        packet.pdu.varbinds[2] = underscore.extend({}, packet.pdu.varbinds[0]
-                                                   , { oid : oidI('1.3.6.1.2.1.1.5.0') } )
-        data = snmp.encode(packet)
-
-        self.socket.send(data, 0, data.length, 161, '255.255.255.255', function (err, bytes) {/* jshint unused: false */
-            if (!err) return
-
-            self.logger.error('initialize', { event : 'send', err : err.message })
-            console.log(err.stack)
-        })
+        self.ping.bind(self)()
+        self.timer = setInterval(self.ping.bind(self), 30 * 1000)
     })
 
     this.socket.bind(0)
 })
+
+SNMP.prototype.ping = function () {
+    var data, packet
+
+    if (this.stopP) return
+
+    packet = new snmp.Packet()
+    // sysDescr.0, sysObjectID.0, and sysName.0
+    packet.pdu.varbinds[0].oid = oidI('1.3.6.1.2.1.1.1.0')
+    packet.pdu.varbinds[1] = underscore.extend({}, packet.pdu.varbinds[0]
+                                               , { oid : oidI('1.3.6.1.2.1.1.2.0') } )
+    packet.pdu.varbinds[2] = underscore.extend({}, packet.pdu.varbinds[0]
+                                               , { oid : oidI('1.3.6.1.2.1.1.5.0') } )
+    data = snmp.encode(packet)
+
+    this.socket.send(data, 0, data.length, 161, '255.255.255.255', function (err, bytes) {/* jshint unused: false */
+        if (!err) return
+
+        this.logger.error('initialize', { event : 'send', err : err.message })
+        console.log(err.stack)
+    })
+}
+
+SNMP.prototype.ticktock = function () {
+    var now = new Date().getTime()
+
+    if (this.stopP) return
+    underscore.keys(this.nodes).forEach(function (key) {
+        if (this.nodes[key] <= now) delete(this.nodes[key])
+    }.bind(this))
+    setTimeout(this.ticktock.bind(this), 15 * 1000)
+}
 
 SNMP.prototype.finalize = cadence(function (async) {/* jshint unused: false */
     this.props.status = 'finishing'
     this.stopP = true
 
     this.socket.close()
+})
+
+
+SNMP.prototype.dispatch = {}
+
+
+SNMP.prototype.dispatch[sysObjectIDs.serverscheck] = cadence(function (async, rinfo, bindings) {
+    var properties, sensor, session, uuid
+
+    session = new snmp.Session({ host : rinfo.address })
+    async(function () {
+        properties = {}
+        session.getSubtree({ oid : oidI(sysObjectIDs.serverscheck + '.3') }, async())
+    }, function (varbinds) {
+        var name
+
+        name = '-'
+        varbinds.forEach(function (varbind) {
+            var leaf = varbind.oid[varbind.oid.length - 2]
+            if ((leaf % 4) === 1) name = varbind.value
+            else if ((leaf % 4) === 2) {
+                underscore.extend(properties, this.normalize(name, varbind.value))
+            }
+        }.bind(this))
+
+        session.getSubtree({ oid : oidI(sysObjectIDs.serverscheck + '.11') }, async())
+    }, function (varbinds) {
+        var capabilities, names
+
+        names = {}
+        varbinds.forEach(function (varbind) {
+            var leaf    = varbind.oid[varbind.oid.length - 2]
+              , subtree = varbind.oid[varbind.oid.length - 3]
+
+            if (leaf === 1) names[subtree] = varbind.value
+            else if ((leaf === 2) && (!!names[subtree])) {
+                underscore.extend(properties, this.normalize(names[subtree], varbind.value))
+            }
+        }.bind(this))
+        console.log('SNMP 2: ' + util.inspect(properties, { depth : null }))
+
+// TODO: use MAC address + rinfo.port
+        uuid = rinfo.address + ':' + rinfo.port
+        sensor = this.sensors[uuid] || {}
+
+        sensor.name = bindings[2].value
+
+        sensor.lastReading = {}
+        capabilities = { fields : [] }
+        underscore.keys(properties).forEach(function (key) {
+            capabilities.fields.push(this.sensorType(key))
+            sensor.lastReading[key] = properties[key]
+        }.bind(this))
+
+        if (!!this.sensors[uuid]) return
+
+        this.register(this, sensor.name, uuid, capabilities, async())
+    }, function (sensorID) {
+        if (sensorID === false) return
+        if (!!sensorID) {
+            this.sensors[uuid] = underscore.extend(sensor, { sensorID : sensorID })
+        }
+
+        this.upsync(this, sensor.sensorID, sensor.lastReading, async())
+    })
 })
 
 

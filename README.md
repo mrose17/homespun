@@ -190,9 +190,7 @@ Here is what it should contain:
             "cloud"       : "numerous",
             "id"          : 1,
             "server"      : "https://api.numerousapp.com/",
-            "credentials" : {
-              "api_key"   : "..."
-            }
+            "api_key"     : "..."
           }
         ]
 
