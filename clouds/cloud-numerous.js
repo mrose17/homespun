@@ -37,12 +37,15 @@ Numerous.prototype.finalize = cadence(function (async) {/* jshint unused: false 
 
 
 Numerous.prototype.register = cadence(function (async, instance, name, uuid, capabilities) {
-    var device, stmt
+    var description, device, id, stmt
       , deviceID = uuid
 
     if (!this.readyP) return false
 
     if (!!this.config.devices[deviceID]) return true
+
+    id = uuid.split(':')
+    description = 'reported by ' + underscore.first(id) + ' ' + underscore.rest(id).join(':')
 
     stmt = async(function () {
         device = { deviceID : deviceID, entries : {}, capabilities : capabilities }
@@ -73,7 +76,7 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                       }
                     , payload                     :
                       { label                     : name + ' ' + (field.name || key)
-                      , description               : 'reported by ' + uuid.split(':').join(' ')
+                      , description               : description
                       , kind                      : kind
                       , units                     : units
                       , precision                 : precision
