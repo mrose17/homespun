@@ -16,11 +16,11 @@ util.inherits(Numerous, Cloud);
 
 
 Numerous.prototype.initialize = cadence(function (async) {
-return
     var loop = async(function () {
         if (this.stopP) return [ loop ]
 
         if (!!this.config.api_key) {
+            this.token = 'Basic ' + new Buffer(this.config.api_key + ':').toString('base64')
             this.props.status = 'idle'
             this.readyP = true
             return [ loop ]
@@ -37,14 +37,12 @@ Numerous.prototype.finalize = cadence(function (async) {/* jshint unused: false 
 
 
 Numerous.prototype.register = cadence(function (async, instance, name, uuid, capabilities) {
-console.log('register ' + instance.config.driver + ':' + instance.config.id + ' ' + name + ' '
-+ uuid + ' ' + JSON.stringify(capabilities, null, 2) + '\n')
     var device, stmt
-      , deviceID = instance.config.driver + ':' + uuid
+      , deviceID = uuid
 
     if (!this.readyP) return false
 
-    if (!!this.config.devices[deviceID]) return deviceID
+    if (!!this.config.devices[deviceID]) return true
 
     stmt = async(function () {
         device = { deviceID : deviceID, entries : {}, capabilities : capabilities }
@@ -70,12 +68,12 @@ console.log('register ' + instance.config.driver + ':' + instance.config.id + ' 
                     { method                      : 'POST'
                     , url                         : this.config.server + '/v2/metrics'
                     , headers                     :
-                      { authorization             : 'Bearer ' + this.config.api_key
+                      { authorization             : this.token
                       , 'user-agent'              : this.version
                       }
                     , payload                     :
-                      { label                     : name + ' ' + key
-                      , description               : 'reported by ' + instance.config.driver + ' ' + uuid
+                      { label                     : name + ' ' + (field.name || key)
+                      , description               : 'reported by ' + uuid.split(':').join(' ')
                       , kind                      : kind
                       , units                     : units
                       , precision                 : precision
@@ -83,7 +81,7 @@ console.log('register ' + instance.config.driver + ':' + instance.config.id + ' 
                       }
                     }, async())
             }, function (body, response) {
-                if ((!response.okay) || (!body.data)) {
+                if ((!response.okay) || (!body.id)) {
                     this.loser('register', 'POST /v2/metrics', body, response)
                     deviceID = undefined
                     return [ stmt ]
@@ -96,7 +94,7 @@ console.log('register ' + instance.config.driver + ':' + instance.config.id + ' 
         this.config.devices[deviceID] = device
         this.persist(this.config, async())
     }, function () {
-        return [ stmt, deviceID ]
+        return [ stmt, true ]
     })()
 })
 
@@ -115,7 +113,7 @@ Numerous.prototype.unregister = cadence(function (async, instance, sensorID) {/*
                     { method                      : 'DELETE'
                     , url                         : this.config.server + '/v2/metrics/' + entry.metric.id
                     , headers                     :
-                      { authorization             : 'Bearer ' + this.config.api_key
+                      { authorization             : this.token
                       , 'user-agent'              : this.version
                       }
                     }, async())
@@ -130,8 +128,6 @@ Numerous.prototype.unregister = cadence(function (async, instance, sensorID) {/*
 })
 
 Numerous.prototype.upsync = cadence(function (async, instance, sensorID, lastReading) {/* jshint unused: false */
-console.log('\nupsync ' + instance.config.driver + ':' + instance.config.id + ' ' + sensorID + ' '
-+ JSON.stringify(lastReading, null, 2) + '\n')
     var device
 
     if (!this.readyP) return
@@ -152,7 +148,7 @@ console.log('\nupsync ' + instance.config.driver + ':' + instance.config.id + ' 
                 , url                         : this.config.server + '/v2/metrics/'
                                                     + entry.metric.id + '/events'
                 , headers                     :
-                  { authorization             : 'Bearer ' + this.config.api_key
+                  { authorization             : this.token
                   , 'user-agent'              : this.version
                   }
                 , payload                     : { value : value }

@@ -54,11 +54,13 @@ Driver.sensorTypes =
                     , aggregate : 'none'                                                             }
 , brightness      : { field     : 'brightness',      type : 'percentage'                             }
 , co              : { field     : 'co',              type : 'float',       units : 'ppm'
+                    , name      : 'CO'
                     , domain    : { lower :    0.0, upper : 100.0 }
                     , readings  : [ readingAbove(1.0) ]                                              }
 // most likely MQ-7
 , 'co.σ'          : { field     : 'co.σ',            type : 'float',       units : 'sigmas'          }
 , co2             : { field     : 'co2',             type : 'float',       units : 'ppm'
+                    , name      : 'CO\u2082'
                     , domain    : { lower :  350.0, upper : 5000.0 }
                     , readings  : [ readingAbove(1200.0) ]                                           }
 , 'co2.σ'         : { field     : 'co2.σ',           type : 'float',       units : 'sigmas'          }
@@ -92,9 +94,11 @@ Driver.sensorTypes =
 , moisture        : { field     : 'moisture',        type : 'percentage'                             }
 , motion          : { field     : 'motion',          type : 'boolean'
                     , readings  : true                                                               }
-, no              : { field     : 'no',              type : 'float',       units : 'ppm'             }
+, no              : { field     : 'no',              type : 'float',       units : 'ppm'
+                    , name      : 'NO'                                                               }
 , 'no.σ'          : { field     : 'no.σ',            type : 'float',       units : 'sigmas'          }
-, no2             : { field     : 'no2',             type : 'float',       units : 'ppm'             }
+, no2             : { field     : 'no2',             type : 'float',       units : 'ppm'
+                    , name      : 'NO\u2082'                                                         }
 , 'no2.σ'         : { field     : 'no2.σ',           type : 'float',       units : 'sigmas'          }
 , noise           : { field     : 'noise',           type : 'float',       units : 'decibels'
                     , readings  : [ readingAbove(60.0) ]                                             }

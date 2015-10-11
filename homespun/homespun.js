@@ -100,21 +100,45 @@ Homespun.prototype.launch = cadence(function (async, prefix, file) {
 
 
 Homespun.prototype.register = cadence(function (async, instance, name, uuid, capabilities) {
-    async.forEach(function (cloud) {
-        cloud.register.bind(cloud)(instance, name, uuid, capabilities, async())
-    })(this.workers.clouds)
+    var result = false
+      , sensorID = instance.config.driver + ':' + uuid
+
+    async(function () {
+        async.forEach(function (cloud) {
+            async(function () {
+                cloud.register.bind(cloud)(instance, name, sensorID, capabilities, async())
+            }, function (hitP) {
+                if (hitP) result = sensorID
+            })
+        })(this.workers.clouds)
+
+    }, function () {
+        return result
+    })
 })
 
 Homespun.prototype.unregister = cadence(function (async, instance, sensorID) {
-    async.forEach(function (cloud) {
-        cloud.unregister.bind(cloud)(instance, sensorID, async())
-    })(this.workers.clouds)
+    async(function () {
+        async.forEach(function (cloud) {
+            async(function () {
+                cloud.unregister.bind(cloud)(instance, sensorID, async())
+            })
+        })(this.workers.clouds)
+    }, function () {
+// async.forEach() completes here...
+    })
 })
 
 Homespun.prototype.upsync = cadence(function (async, instance, sensorID, lastReading) {
-    async.forEach(function (cloud) {
-        cloud.upsync.bind(cloud)(instance, sensorID, lastReading, async())
-    })(this.workers.clouds)
+    async(function () {
+        async.forEach(function (cloud) {
+            async(function () {
+                cloud.upsync.bind(cloud)(instance, sensorID, lastReading, async())
+            })
+        })(this.workers.clouds)
+    }, function () {
+// async.forEach() completes here...
+    })
 })
 
 Homespun.prototype.persist = cadence(function (async, instance) {

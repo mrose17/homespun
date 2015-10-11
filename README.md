@@ -11,6 +11,7 @@ Note that this repository does not have either the "Issues" or "Wiki" sections -
 if you want to discuss the homespun framework,
 please send an email to the [maintainer](mailto:mrose17@homespun.io)
 requesting to be added to the [homespun team](https://homespun-io.slack.com).
+Or, send an SMS to the [homespun hotline](sms:+1-747-2022294).
 
 ## Theory of Operation
 In your home,
