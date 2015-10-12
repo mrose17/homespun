@@ -45,7 +45,9 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
     if (!!this.config.devices[deviceID]) return true
 
     id = uuid.split(':')
-    description = 'reported by ' + underscore.first(id) + ' ' + underscore.rest(id).join(':')
+    description = 'reporting by homespun'
+    if (!!this.npminfo) description += ' v' + this.npminfo.version
+    description += ' for ' + underscore.first(id) + ' ' + underscore.rest(id).join(':')
 
     stmt = async(function () {
         device = { deviceID : deviceID, entries : {}, capabilities : capabilities }
@@ -57,14 +59,17 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                 var kind      =  { float      : 'number'
                                  , percentage : 'percent'
                                  }[field.type]
+                  , label     = name + ' ' + (field.name || key)
                   , precision = -1
-                  , units     = field.units
+                  , units     = field.abbrev || field.units
 
                 if (units === 'celcius') {
                     kind = 'temperature'
-                    precision = 1
-                    units = 'fahrenheit'
-                } else if (units == 'sigmas') precision = 3
+                    units = '°F'
+                } else if (kind === 'percent') {
+                    label = name
+                    units = field.name || key
+                } else if (units === 'sigmas') precision = 3
                 if (!kind) return
 
                 this.ua.fetch(
@@ -75,7 +80,7 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                       , 'user-agent'              : this.version
                       }
                     , payload                     :
-                      { label                     : name + ' ' + (field.name || key)
+                      { label                     : label
                       , description               : description
                       , kind                      : kind
                       , units                     : units
@@ -96,6 +101,41 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
     }, function () {
         this.config.devices[deviceID] = device
         this.persist(this.config, async())
+    }, function () {
+        async.forEach(function (key) {
+            var payload
+              , entry = device.entries[key]
+              , domain = entry.field.domain
+
+            if (!domain) return
+
+            payload = { notificationsEnabled : true }
+            underscore.keys(domain).forEach(function (d) {
+                var value = domain[d]
+
+                if (entry.field.units === 'celcius') value = (value * 1.8) + 32
+                underscore.extend(payload
+                                 , { lower : { notifyWhenBelow : value, notifyWhenBelowSet : true }
+                                   , upper : { notifyWhenAbove : value, notifyWhenAboveSet : true }
+                                   }[d] || {})
+            }.bind(this))
+            if (underscore.keys(payload).length < 2) return
+
+            async(function () {
+                this.ua.fetch(
+                    { method                      : 'PUT'
+                    , url                         : this.config.server + '/v2/metrics/' + entry.metric.id
+                                                        + '/subscriptions/me'
+                    , headers                     :
+                      { authorization             : this.token
+                      , 'user-agent'              : this.version
+                      }
+                    , payload                     : payload
+                    }, async())
+            }, function (body, response) {
+                if (!response.okay) this.loser('subscription', 'POST', body, response)
+            })
+        })(underscore.keys(device.entries))
     }, function () {
         return [ stmt, true ]
     })()
@@ -123,7 +163,7 @@ Numerous.prototype.unregister = cadence(function (async, instance, sensorID) {/*
             }, function (body, response) {
                 if (!response.okay) this.loser('unregister', 'DELETE', body, response)
             })
-        })
+        }.bind(this))
     }, function () {
         delete(this.config.devices[sensorID])
         this.persist(this.config, async())

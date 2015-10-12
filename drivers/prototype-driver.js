@@ -47,6 +47,7 @@ Driver.sensorTypes =
 , airflow         : { field     : 'airflow',         type : 'float',       units : 'meters/second'
                     , domain    : { lower :    0.0, upper : 135.0 }                                  }
 , aqi             : { field     : 'aqi',             type : 'percentage'
+                    , name      : 'AQ index'
                     , readings  : [ readingBelow(0.11), readingAbove(0.19) ]                         }
 // most likely MQ-135
 , 'aqi.σ'         : { field     : 'aqi.σ',           type : 'float',       units : 'sigmas'          }
@@ -84,7 +85,8 @@ Driver.sensorTypes =
 , hydrogen        : { field     : 'hydrogen',        type : 'float',       units : 'ppm'             }
 // most likely MQ-8
 , 'hydrogen.σ'    : { field     : 'hydrogen.σ',      type : 'float',       units : 'sigmas'          }
-, light           : { field     : 'light',           type : 'float',       units : 'lux'             }
+, light           : { field     : 'light',           type : 'float',       units : 'lux'
+                    , abbrev    : 'lx'                                                               }
 , liquid_detected : { field     : 'liquid_detected', type : 'boolean'
                     , readings  : true                                                               }
 , location        : { field     : 'location',        type : 'quad',        units : 'coordinates'     }
@@ -101,11 +103,14 @@ Driver.sensorTypes =
                     , name      : 'NO\u2082'                                                         }
 , 'no2.σ'         : { field     : 'no2.σ',           type : 'float',       units : 'sigmas'          }
 , noise           : { field     : 'noise',           type : 'float',       units : 'decibels'
+                    , abbrev    : 'dB'
                     , readings  : [ readingAbove(60.0) ]                                             }
 , opened          : { field     : 'opened',          type : 'boolean'
                     , readings  : true                                                               }
 , 'particles.2_5' : { field     : 'particles.2_5',   type : 'float'
                     , units     : 'micrograms/cubicmeters'
+                    , name      : 'particles μm'
+                    , abbrev    : 'µg/m\u00B3'
                     , readings  : [ readingAbove(2.5) ]                                              }
 , particulates    : { field     : 'particulates',    type : 'float'
                     , units     : 'particles/cubicmeters'                                            }
@@ -115,8 +120,10 @@ Driver.sensorTypes =
 , pressed         : { field     : 'pressed',         type : 'boolean'
                     , readings  : [ readingEquals(true) ]                                            }
 , pressure        : { field     : 'pressure',        type : 'float',       units : 'millibars'
+                    , abbrev    : 'mbar'
                     , domain    : { lower :  945.0, upper : 1081.0 }                                 }
 , rainfall        : { field     : 'rainfall',        type : 'float',       units : 'millimeters'
+                    , abbrev    : 'mm'
                     , domain    : { lower :    0.0, upper : 1000.0 }                                 }
 , signal          : { field     : 'signal',          type : 'percentage'
                     , aggregate : 'none'                                                             }
@@ -126,9 +133,11 @@ Driver.sensorTypes =
 , tamper_detected : { field     : 'tamper_detected', type : 'boolean'
                     , readings  : [ readingEquals(true) ]                                            }
 , temperature     : { field     : 'temperature',     type : 'float',       units : 'celcius'
+                    , abbrev    : '°C'
                     , domain    : { lower :    5.0, upper : 45.0 }
                     , readings  : [ readingBelow(10.0), readingAbove(35.0) ]                         }
 , uvi             : { field     : 'uvi',             type : 'float',       units : 'uv-index'
+                    , name      : 'UV index'
                     , domain    : { lower :    0.0, upper : 12.0 }                                   }
 , vapor           : { field     : 'vapor',           type : 'float',       units : 'ppm'             }
 // most likely MQ-3 (alcohol)

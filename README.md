@@ -6,12 +6,21 @@ upload to only one cloud is available:
 [numerous](http://numerousapp.com/).
 It is meant to be easy to add support for other clouds.
 
-
 Note that this repository does not have either the "Issues" or "Wiki" sections --
 if you want to discuss the homespun framework,
 please send an email to the [maintainer](mailto:mrose17@homespun.io)
 requesting to be added to the [homespun team](https://homespun-io.slack.com).
 Or, send an SMS to the [homespun hotline](sms:+1-747-2022294).
+
+`homespun` is neither a [home automation](https://en.wikipedia.org/wiki/Home_automation) (HA) systen
+nor an [Internet of Things](https://en.wikipedia.org/wiki/Internet_of_Things) (IoT) system.
+It simply moves transcodes data for different kinds of sensors and stores them in different kinds of cloud services.
+There are many great HA and IoT systems available.
+For example,
+the [Wink platform](https://en.wikipedia.org/wiki/Wink_(platform)) is an example of a commercial system for consumers,
+and the [Thing system](http://thethingsystem.com) is an example of an open-source system for makers.
+Although they target different groups,
+they both offer vastly superior functionality to what `homespun` provides.
 
 ## Theory of Operation
 In your home,

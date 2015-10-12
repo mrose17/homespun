@@ -20,8 +20,9 @@ var Cloud = function (config, services) {
     this.stopP = false
 
     this.ua = new UserAgent()
+    this.npminfo = npminfo
     this.version = 'Manufacturer/' + os.platform() + ' node/' + process.versions.node + ' homespun/'
-                   + ((!!npminfo) ? npminfo.version : 'unknown')
+                   + ((!!this.npminfo) ? this.npminfo.version : 'unknown')
 
     this.logger = require('prolific').createLogger(config.cloud + '.cloud-' + config.id)
 }

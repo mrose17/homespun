@@ -1,5 +1,5 @@
 { "name"                      : "homespun"
-, "version"                   : "0.9.1"
+, "version"                   : "0.9.2"
 , "main"                      : "node server.js"
 , "author"                    : "Marshall Rose <mrose17@homespun.io>"
 , "description"               : ""
@@ -10,14 +10,14 @@
 , "contributors"              : [ "Marshall Rose <mrose17@homespun.io>" ]
 , "maintainers"               : [ "Marshall Rose <mrose17@homespun.io>" ]
 , "homepage"                  : "http://github.com/mrose17/homespun"
-, "repository"                : 
+, "repository"                :
   { "type"                    : "git"
   , "url"                     : "git://github.com/mrose17/homespun.git"
   }
-,  "dependencies"             : 
+, "dependencies"              :
    { "arguable"               : "0.0.20"
    , "body-parser"            : "1.13.2"
-   , "cadence"                : "0.0.56" 
+   , "cadence"                : "0.0.56"
    , "connect"                : "3.0.1"
    , "express-xml-bodyparser" : "0.0.7"
    , "inlet"                  : "0.2.4"
