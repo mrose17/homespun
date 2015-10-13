@@ -214,7 +214,7 @@ You can determine the value of `apiKey` by running the `numerous` mobile applica
 In addition to both [Android](https://play.google.com/store/apps/details?id=com.numerousapp)
 and [iOS](https://itunes.apple.com/us/app/numerous-lifes-most-important/id797642904?mt=8) apps,
 `numerous` supports the concept of embedded information.
-Take a look [here](examples/numerous.md) for an example.
+Take a look [here](examples/numerous.html) for an example.
 
 ## Sensor Drivers
 `homespun` comes with several sensor drivers to help you get started!
