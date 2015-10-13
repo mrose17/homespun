@@ -1,10 +1,10 @@
 { "name"                      : "homespun"
-, "version"                   : "0.9.4"
+, "version"                   : "0.9.5"
 , "main"                      : "node server.js"
 , "author"                    : "Marshall Rose <mrose17@homespun.io>"
 , "description"               : ""
-, "keywords"                  : [ "homespun", "sensors", "home automation"
-                                  , "numerous"
+, "keywords"                  : [ "homespun", "sensors", "home automation", "IoT", "internet of things"
+                                , "numerous"
                                 , "TSRP", "Yoctopuce", "cubesensors", "foobot", "netatmo", "snmp"
                                 ]
 , "contributors"              : [ "Marshall Rose <mrose17@homespun.io>" ]

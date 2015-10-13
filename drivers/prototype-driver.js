@@ -120,10 +120,8 @@ Driver.sensorTypes =
 , pressed         : { field     : 'pressed',         type : 'boolean'
                     , readings  : [ readingEquals(true) ]                                            }
 , pressure        : { field     : 'pressure',        type : 'float',       units : 'millibars'
-                    , abbrev    : 'mbar'
                     , domain    : { lower :  945.0, upper : 1081.0 }                                 }
 , rainfall        : { field     : 'rainfall',        type : 'float',       units : 'millimeters'
-                    , abbrev    : 'mm'
                     , domain    : { lower :    0.0, upper : 1000.0 }                                 }
 , signal          : { field     : 'signal',          type : 'percentage'
                     , aggregate : 'none'                                                             }
