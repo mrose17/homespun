@@ -69,7 +69,11 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                 } else if (kind === 'percent') {
                     label = name
                     units = field.name || key
-                } else if (units === 'sigmas') precision = 3
+                } else if (units === 'sigmas') {
+                    label = name
+                    units = field.name || key
+                    precision = 3
+                }
                 if (!kind) return
 
                 this.ua.fetch(
@@ -89,6 +93,9 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                       }
                     }, async())
             }, function (body, response) {
+// TODO: TSRP driver seems to duplicate, not sure why...
+                if (!response) return console.log('\ngot a TSRP duplicate\n')
+
                 if ((!response.okay) || (!body.id)) {
                     this.loser('register', 'POST /v2/metrics', body, response)
                     deviceID = undefined
