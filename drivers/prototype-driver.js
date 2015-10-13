@@ -147,6 +147,7 @@ Driver.sensorTypes =
 , vibration       : { field     : 'vibration',       type : 'boolean'
                     , readings  : true                                                               }
 , voc             : { field     : 'voc',             type : 'float',       units : 'ppm'
+                    , name      : 'Volatile Organics'
                     , readings  : [ readingAbove(1.0) ]                                              }
 , windheading     : { field     : 'windheading',     type : 'float',       units : 'degrees'
                     , domain    : { lower :    0.0, upper : 360.0 }                                  }

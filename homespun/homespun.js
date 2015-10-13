@@ -64,29 +64,32 @@ Homespun.prototype.launch = cadence(function (async, prefix, file) {
         })
     }, /^ENOENT$/, function () {
     } ], function () {
-        var init = function (moduleName) {
-            return function (err) {
-                if (!err) return
+        var init = function (config, moduleName, prefix, worker) {
+              return function (err) {
+                  if (!err) return
 
-                logger.error('initialize'
-                            , { event  : 'terminated'
-                              , err    : err.message
-                              , module : moduleName
-                              })
-                console.log(err.stack)
-            }.bind(this)
-        }.bind(this)
+                  logger.error('initialize'
+                              , { event  : 'terminated'
+                                , err    : err.message
+                                , module : moduleName
+                                })
+                  console.log(err.stack)
 
-        async.forEach(function (config) {
+                  setTimeout(function () {
+                      start(config, moduleName, prefix, worker, true)
+                  }.bind(this), 30 * 1000)
+              }.bind(this)
+          }.bind(this)
+        , start = function (config, moduleName, prefix, worker, restartP) {
             var instance
               , params = { type : prefix, worker : worker, id : config.id }
 
-            logger.info('initialize', underscore.extend({ event : 'start' }, params))
+            logger.info('initialize', underscore.extend({ event : restartP ? 'start' : 'start'}, params))
             try {
-                instance = new (require(module))(config, this.services)
+                instance = new (require(moduleName))(config, this.services)
                 this.workers[plural].push(instance)
 
-                instance.initialize(init(module))
+                instance.initialize(init(config, moduleName, prefix, worker))
             } catch (err) {
                 logger.error('initialize'
                            , underscore.extend({ event : 'require', err : err.message }, params))
@@ -94,6 +97,10 @@ Homespun.prototype.launch = cadence(function (async, prefix, file) {
                 return
             }
             logger.info('initialize', underscore.extend({ event : 'running' }, params))
+          }.bind(this)
+
+        async.forEach(function (config) {
+            start(config, module, prefix, worker)
         })(this[plural][worker])
     })
 })

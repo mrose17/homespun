@@ -6,7 +6,7 @@ upload to only one cloud is available:
 [numerous](http://numerousapp.com/).
 It is meant to be easy to add support for other clouds.
 
-Note that this repository does not have either the "Issues" or "Wiki" sections --
+Note that this repository does not have the "Wiki" section --
 if you want to discuss the homespun framework,
 please send an email to the [maintainer](mailto:mrose17@homespun.io)
 requesting to be added to the [homespun team](https://homespun-io.slack.com).
@@ -21,6 +21,8 @@ the [Wink platform](https://en.wikipedia.org/wiki/Wink_(platform)) is an example
 and the [Thing system](http://thethingsystem.com) is an example of an open-source system for makers.
 Although they target different groups,
 they both offer vastly superior functionality to what `homespun` provides.
+(Disclaimer: I used to work at Wink, and I was one of the original curators of the Thing system...
+I am very big fans of both!)
 
 ## Theory of Operation
 In your home,
@@ -207,8 +209,15 @@ Here is what it should contain:
 You can determine the value of `apiKey` by running the `numerous` mobile application and looking under 
 `Settings > Developer Info`.
 
-## Supported Sensor Drivers
-`homespun` comes with some pre-written sensor drivers to help you get started!
+### Numerous
+[numerous](http://numerousapp.com/) is a cloud-service and a set mobile applications.
+In addition to both [Android](https://play.google.com/store/apps/details?id=com.numerousapp)
+and [iOS](https://itunes.apple.com/us/app/numerous-lifes-most-important/id797642904?mt=8) apps,
+`numerous` supports the concept of embedded information.
+Take a look [here](examples/numerous.md) for an example.
+
+## Sensor Drivers
+`homespun` comes with several sensor drivers to help you get started!
 
 It is easiest to integrate using [TSRP](http://thethingsystem.com/dev/Thing-Sensor-Reporting-Protocol.html).
 At present,
@@ -220,7 +229,7 @@ there are two repositories that contain TSRP transcoders:
 * [homespun-grovepi](https://github.com/mrose17/homespun-grovepi), a Node.js module for the
 [Raspberry Pi](https://www.raspberrypi.org) and a [GrovePi+ Shield](http://www.dexterindustries.com/shop/grovepi-board/).
 
-`homespun` also knows how to [talk to Yoctopuce sensors].
+`homespun` also knows how to [talk to Yoctopuce sensors](#yoctopuce).
 
 It also knows how to talk to the 
 [CubeSensors](https://cubesensors.com),
@@ -390,3 +399,5 @@ which transcodes them into standard deviation values that are uploaded to the ma
 |no2.σ|no2.ε|
 |smoke.σ|smoke.ε|
 |vapor.σ|vapor.ε|
+
+### TODO

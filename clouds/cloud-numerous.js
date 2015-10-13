@@ -148,6 +148,11 @@ Numerous.prototype.unregister = cadence(function (async, instance, sensorID) {/*
 
     device = this.config.devices[sensorID]
     if (!device) return this.logger.error('unregister', { event : 'lookup', sensorID : sensorID })
+try {
+console.log('unregister: ' + JSON.stringify(JSON.parse(require('json-stringify-safe')(device)), null, 2))
+} catch (ex) {
+console.log(require('json-stringify-safe')(device))
+}
 
     async(function () {
         device.entries.forEach(function (entry) {
