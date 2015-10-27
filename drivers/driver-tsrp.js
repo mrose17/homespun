@@ -1,5 +1,5 @@
 var cadence     = require('cadence/redux')
-  , dgram        = require('dgram')
+  , dgram       = require('dgram')
   , path        = require('path')
   , underscore  = require('underscore')
   , util        = require('util')
@@ -15,20 +15,19 @@ var TSRP = function (config, services) {
     this.depth = {}
     this.prototypes = {}
     this.reports = {}
+    this.timestamps = {}
 }
 // jscs:enable requireMultipleVarDecl
 util.inherits(TSRP, Driver)
 
 
 TSRP.prototype.initialize = cadence(function (async) {/* jshint unused: false */
-// TODO: rate-limiting on upsync
-return
     var ipaddr = '224.0.9.1'
       , portno = 22601
       , self   = this
 
     this.socket = dgram.createSocket('udp4').on('message', function (message, rinfo) {
-        var report, tag
+        var now, report, tag
 
         tag = rinfo.address + ':' + rinfo.port
         try { report = JSON.parse(message) } catch (err) {
@@ -36,6 +35,9 @@ return
         }
 
         if (!self.reports[tag]) self.reports[tag] = []
+        now = new Date().getTime()
+        if (!self.timestamps[tag]) self.timestamps[tag] = now
+        if (self.timestamps[tag] > now) return
         self.reports[tag].push(report)
 
         if ((self.reports[tag].length > 1) || (self.depth[tag] > 0)) return
@@ -76,10 +78,19 @@ TSRP.prototype.finalize = cadence(function (async) {/* jshint unused: false */
 
 TSRP.prototype.drain = cadence(function (async, device, tag) {
     var outer = async(function () {
-        if (this.reports[tag].length === 0) return [ outer ]
+        var report
+
+        if (this.reports[tag].length === 0) {
+            this.timestamps[tag] = new Date().getTime() + (30 * 1000)
+            return [ outer ]
+        }
 
         if (!this.depth[tag]) this.depth[tag] = 0
-        this.examine(device, tag, this.reports[tag].shift(), async())
+
+        report = underscore.last(this.reports[tag])
+        this.reports[tag] = []
+
+        this.examine(device, tag, report, async())
     }, function () {
         var inner = async(function () {
             if (this.depth[tag] === 0) return [ inner ]

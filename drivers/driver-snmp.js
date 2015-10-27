@@ -95,7 +95,7 @@ SNMP.prototype.ping = function () {
 
         this.logger.error('initialize', { event : 'send', err : err.message })
         console.log(err.stack)
-    })
+    }.bind(this))
 }
 
 SNMP.prototype.finalize = cadence(function (async) {/* jshint unused: false */

@@ -67,6 +67,16 @@ module.exports = cadence(function (async, config) {
                     servers.push(server)
                     parsed = url.parse(config[service])
                     server.listen(parsed.port, parsed.hostname, async())
+                    server.on('clientError', function (err, socket) {
+                        logger.error('socket'
+                                    , { event  : 'clientError'
+                                      , local  : config[service]
+                                      , remote : socket.remoteAddress + ':' + socket.remotePort
+                                      , error  : err.toString()
+                                    });
+                    }).on('close', function () {
+                        logger.info('socket', { event : 'close' , local : config[service] })
+                    })
                 })
             })
         }, function () {

@@ -60,7 +60,7 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                                  , percentage : 'percent'
                                  }[field.type]
                   , label     = name + ' ' + (field.name || key)
-                  , precision = -1
+                  , precision = 3
                   , units     = field.abbrev || field.units
 
                 if (units === 'celcius') {
@@ -69,10 +69,10 @@ Numerous.prototype.register = cadence(function (async, instance, name, uuid, cap
                 } else if (kind === 'percent') {
                     label = name
                     units = field.name || key
+                    precision = 2
                 } else if (units === 'sigmas') {
                     label = name
                     units = field.name || key
-                    precision = 3
                 }
                 if (!kind) return
 

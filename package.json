@@ -21,6 +21,7 @@
    , "connect"                : "3.0.1"
    , "express-xml-bodyparser" : "0.0.7"
    , "inlet"                  : "0.2.4"
+   , "mqtt"                   : "1.4.3"
    , "node-static"            : "0.7.7"
    , "node-uuid"              : "1.4.1"
    , "oauth"                  : "git://github.com/TheThingSystem/node-oauth.git"
