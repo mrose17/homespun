@@ -7,6 +7,7 @@
                                 , "numerous"
                                 , "TSRP", "Yoctopuce", "cubesensors", "foobot", "netatmo", "snmp"
                                 ]
+, "license"                   : "MIT"
 , "contributors"              : [ "Marshall Rose <mrose17@homespun.io>" ]
 , "maintainers"               : [ "Marshall Rose <mrose17@homespun.io>" ]
 , "homepage"                  : "http://github.com/mrose17/homespun"

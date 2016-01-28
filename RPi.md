@@ -13,6 +13,7 @@ we connect to the platform via `ssh` -- the username (`pi`) and passphrase(`rasp
         ...
         pi@raspberrypi ~ $
 
+### Localize the Timezone
 Now configure the timezone:
 
         pi@raspberrypi ~ $ sudo raspi-config
@@ -30,6 +31,7 @@ The next thing to do is make sure the platform is current with respect to its pa
 These commands may take a while.
 Please be patient.
 
+### Remote Access _only_ via ssh
 Second,
 let's fix the default password.
 Generate an `ssh` keypair on your desktop:
@@ -76,6 +78,32 @@ you will connect to the platform like this:
 
         % ssh -i ~/.ssh/id_homespun.pub pi@raspberrypi.local
 
+### Disable some Bonjour advertisements
+By default, the RPi advertises some unnecessary services.
+
+First, run this to disable the `_udisks-ssh._tcp` service:
+
+        pi@raspberrypi ~ $ cd /etc/avahi
+        pi@raspberrypi ~ $ sudo mkdir disabled
+        pi@raspberrypi ~ $ sudo mv services/udisks.service disabled
+
+Next, disable the `_workstation._tcp` service:
+    
+        pi@raspberrypi ~ $ sudo vi avahi-daemon.conf
+
+and look for the line that says:
+
+        #publish-workstation=yes
+
+and change it to:
+
+        publish-workstation=no
+
+
+Finally, run this:
+
+        pi@raspberrypi ~ $ sudo /etc/init.d/avahi restart
+
 ## Get Node.js
 The first thing you want to do is see if node is already there,
 and if so, what version you have.
@@ -90,10 +118,10 @@ the answer is no;
 otherwise we'd see something like this:
 
         pi@raspberrypi ~ $ node --version
-        v0.10.22
+        v5.1.1
 
 In this case,
-the version number is `v0.10.22`.
+the version number is `v5.1.1`.
 If the version number is less than `v0.10.40`,
 then you're going to need to install a newer version of Node.js.
 
@@ -111,10 +139,10 @@ here's the [alternative](https://github.com/nodesource/distributions):
 However,
 if you really do want to install from scratch
 
-        pi@raspberrypi ~ $ git clone https://github.com/joyent/node.git
+        pi@raspberrypi ~ $ git clone https://github.com/nodejs/node.git
         ...
         pi@raspberrypi ~ $ cd node
-        pi@raspberrypi ~/node $ git checkout v0.10.22 -b v0.10.22
+        pi@raspberrypi ~/node $ git checkout v5.1.1 -b v5.1.1
         pi@raspberrypi ~/node $ ./configure --without-snapshot
 
         pi@raspberrypi ~/node $ make
