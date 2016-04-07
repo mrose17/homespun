@@ -29,6 +29,10 @@ Foobot.prototype.initialize = cadence(function (async) {
         timestamp = 0
         inner = async(function () {
             if ((!this.config.xauth) || (!this.config.xauth.token)) {
+/* if this.config.xauth.key, then POST '/v2/user/' + this.config.xauth.user + '/login/' with { password: ... }
+   on response 200, body='true', then set this.config.xauth.token to the x-auth-token header.
+ */
+
                 this.props.status = 'configuration'
                 return [ inner, 15 ]
             }
@@ -88,7 +92,7 @@ Foobot.prototype.initialize = cadence(function (async) {
 
                     sensor.lastReading = {}
                     capabilities = { fields : [] }
-                    properties = this.normalize(device.uuid, body.sensors, body.datapoints[0])
+                    properties = this.normalize(device.uuid, body.sensors || [], body.datapoints ? body.datapoints[0] : [])
                     underscore.keys(properties).forEach(function (key) {
                         capabilities.fields.push(this.sensorType(key))
                         sensor.lastReading[key] = properties[key]
