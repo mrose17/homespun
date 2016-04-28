@@ -92,7 +92,9 @@ Foobot.prototype.initialize = cadence(function (async) {
 
                     sensor.lastReading = {}
                     capabilities = { fields : [] }
-                    properties = this.normalize(device.uuid, body.sensors || [], body.datapoints ? body.datapoints[0] : [])
+
+                    properties = this.normalize(device.uuid, body.sensors || []
+                                              , body.datapoints ? body.datapoints[0] : [])
                     underscore.keys(properties).forEach(function (key) {
                         capabilities.fields.push(this.sensorType(key))
                         sensor.lastReading[key] = properties[key]
